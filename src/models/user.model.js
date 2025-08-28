@@ -14,7 +14,7 @@ const userSchema = new Schema({
             localPath : ""
         }
     },
-    usename : {
+    username : {
         type : String,
         required : true,
         unique : true,
@@ -42,8 +42,7 @@ const userSchema = new Schema({
         default : false
     },
     refreshToken : {
-        type : String,
-        required : true
+        type : String
     },
     forgotPasswordToken : {
         type : String
@@ -71,46 +70,48 @@ userSchema.pre("save" , async function (next){
     next()
 })
 
-userSchema.method.isPasswordCorrect = async function (password) {
+userSchema.methods.isPasswordCorrect = async function (password) {
    return await bcrypt.compare(password,this.password)
 }
 
-userSchema.method.generateAccessToken = function(){
-    jwt.sign(
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
         {
         _id : this.id,
         email : this.email,
-        usename : this.username
+        username : this.username
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-        expiresIn : ACCESS_TOKEN_EXPIRY
+        expiresIn : process.env.ACCESS_TOKEN_EXPIRY
     }
     )
 }
 
-userSchema.method.generateRefreshToken = function(){
-    jwt.sign(
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
         {
         _id : this.id,
         email : this.email,
-        usename : this.username
+        username : this.username
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-        expiresIn : REFRESH_TOKEN_EXPIRY
+        expiresIn : process.env.REFRESH_TOKEN_EXPIRY
     }
     )
 }
 
-userSchema.method.generateTemporaryToken = function(){
+userSchema.methods.generateTemporaryToken = function(){
     const unhashedToken = crypto.randomBytes(20).toString("hex")
 
     const hashedToken = crypto.createHash("sha256")
                               .update(unhashedToken)
                               .digest("hex")
 
-    const tokenExpiry = Date.now() + (20*60*1000) // added 20 minutes                         
+    const tokenExpiry = Date.now() + (20*60*1000) // added 20 minutes 
+    
+    return {unhashedToken,hashedToken,tokenExpiry}
 }
 
 export const User =  mongoose.model("User",userSchema)
