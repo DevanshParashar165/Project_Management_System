@@ -375,4 +375,4 @@ const changeCurrentPassword = asyncHandler(async(req,res) => {
 })
 
 
-export { registerUser, loginUser, logoutUser, getCurrentUser, verificationEmail, resendEmailVerification, forgotPasswordRequest, resetForgotPassword, changeCurrentPassword }
+export { registerUser, loginUser, logoutUser, getCurrentUser, verificationEmail, resendEmailVerification, forgotPasswordRequest, resetForgotPassword, changeCurrentPassword, refreshAccessToken }
